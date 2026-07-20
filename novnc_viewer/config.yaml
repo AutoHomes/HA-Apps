@@ -1,0 +1,33 @@
+name: "VNC Viewer"
+version: "1.0.0"
+slug: "novnc_viewer"
+description: "Browser-based VNC viewer with a device picker - auto-connects to any of your configured VNC hosts, right from the Home Assistant sidebar"
+url: "https://github.com/AutoHomes/ha-apps/tree/main/novnc_viewer"
+arch:
+  - aarch64
+  - amd64
+  - armv7
+init: false
+startup: application
+boot: manual
+ingress: true
+ingress_port: 6080
+ingress_stream: true
+panel_icon: mdi:monitor-screenshot
+panel_title: "Remote Desktops"
+options:
+  resize: "scale"
+  vnc_hosts:
+    - name: "Living Room"
+      host: "192.168.1.50"
+      port: 5900
+      password: "changeme"
+      view_only: false
+schema:
+  resize: "list(off|scale|remote)"
+  vnc_hosts:
+    - name: str
+      host: str
+      port: port
+      password: password
+      view_only: bool?

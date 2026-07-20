@@ -1,0 +1,11 @@
+configuration:
+  resize:
+    name: Resize mode
+    description: "scale = fit picture to your window (recommended). remote = ask the server to change its resolution to match. off = no resizing."
+  vnc_hosts:
+    name: Devices
+    description: >-
+      One entry per VNC device. Each gets its own card in the picker (or, if
+      you only add one, the app connects straight to it). Fields per device:
+      name (label shown on its card), host, port (usually 5900), password
+      (leave as-is if the server has none), and view_only.
