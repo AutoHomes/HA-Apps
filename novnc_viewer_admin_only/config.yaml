@@ -1,8 +1,8 @@
-name: "VNC Viewer"
-version: "1.1.0"
-slug: "novnc_viewer"
+name: "VNC Viewer [Admin Only]"
+version: "1.0.0"
+slug: "novnc_viewer_admin_only"
 description: "Browser-based VNC viewer with a device picker - auto-connects to any of your configured VNC hosts, right from the Home Assistant sidebar"
-url: "https://github.com/AutoHomes/ha-apps/tree/main/novnc_viewer"
+url: "https://github.com/AutoHomes/ha-apps/tree/main/novnc_viewer_admin_only"
 arch:
   - aarch64
   - amd64
@@ -10,12 +10,11 @@ arch:
 init: false
 startup: application
 boot: manual
-panel_admin: false
 ingress: true
 ingress_port: 6080
 ingress_stream: true
 panel_icon: mdi:monitor-screenshot
-panel_title: "Remote Desktops"
+panel_title: "Remote Desktops [Admin Only]"
 options:
   resize: "scale"
   vnc_hosts:
