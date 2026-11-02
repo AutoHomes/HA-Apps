@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1
+- Fix: the Configuration tab couldn't save "Durations (hours)" ("Invalid list for option 'grant_durations'"). Durations are now entered like Notify services: type a number, press Enter.
+- Clearer error when "Local - verify certificate" is on but the console's certificate is self-signed or doesn't match the host.
+
 ## 1.0.0
 - Port access: grant an IP access to a port forward through a UniFi IP list, for 1/2/5 hours or with no expiry. Expired access is removed automatically.
 - "Open to anyone" for a limited time, closed again automatically.

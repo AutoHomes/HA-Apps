@@ -1,5 +1,5 @@
 name: "UniFi Control (beta)"
-version: "1.0.0"
+version: "1.0.1"
 slug: "unifi_control-beta"
 stage: experimental
 description: "[Beta] Manage your UniFi network - with per-user permissions and admin phone alerts"
@@ -33,9 +33,9 @@ options:
   force_provision: false
   notify_services: []
   grant_durations:
-    - 1
-    - 2
-    - 5
+    - "1"
+    - "2"
+    - "5"
   public_ip_lookup: true
   wifi_password_length: 16
   log_level: "info"
@@ -53,8 +53,10 @@ schema:
   force_provision: "bool"
   notify_services:
     - "str"
+  # Whole hours, 1-720. Text rather than int because the Configuration tab
+  # can't edit a list of numbers (it shows one number box and saves a scalar).
   grant_durations:
-    - "int(1,720)"
+    - "match(^([1-9][0-9]?|[1-6][0-9]{2}|7[01][0-9]|720)$)"
   public_ip_lookup: "bool"
   wifi_password_length: "int(8,63)"
   log_level: "list(debug|info|warning|error)"

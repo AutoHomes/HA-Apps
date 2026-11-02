@@ -33,10 +33,10 @@ configuration:
     description: "Push each change to the gateway immediately instead of waiting for UniFi. Turn on if changes take a while to take effect (e.g. Cloud Key managing a separate gateway)."
   notify_services:
     name: Notify services (admin alerts)
-    description: "One per line, e.g. mobile_app_my_phone. Every grant, expiry, open/close and WiFi change is sent here."
+    description: "Type each one and press Enter, e.g. mobile_app_my_phone. Every grant, expiry, open/close and WiFi change is sent here."
   grant_durations:
     name: Durations (hours)
-    description: "Time choices offered for granting access and for opening a port to anyone."
+    description: "Time choices offered for granting access and for opening a port to anyone. Whole hours from 1 to 720 - type each one and press Enter."
   public_ip_lookup:
     name: Detect "This device" IP
     description: "Lets the browser ask api.ipify.org for its public IP so it can be granted in one tap."

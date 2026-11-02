@@ -34,6 +34,10 @@ BAD_LOGIN = (
     "UniFi rejected the username/password. Use a local admin account on the console "
     "(UI.com accounts protected by MFA can't sign in from apps), or an API key."
 )
+BAD_CERT = (
+    "UniFi's certificate at {where} couldn't be verified - consoles ship with a self-signed one. "
+    "Turn off \"Local - verify certificate\" on this app's Configuration tab."
+)
 
 
 class UnifiClient:
@@ -97,6 +101,8 @@ class UnifiClient:
 
     def _unreachable(self, err: Exception) -> UnifiError:
         where = "api.ui.com" if self.mode == "cloud" else self._host_base()
+        if isinstance(err, aiohttp.ClientConnectorCertificateError) and self.mode == "local":
+            return UnifiError(BAD_CERT.format(where=where))
         return UnifiError(f"Can't reach UniFi at {where}: {err or 'timed out'}")
 
     async def _ensure_kind(self) -> None:

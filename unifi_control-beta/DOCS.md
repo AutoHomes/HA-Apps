@@ -45,7 +45,7 @@ Ubiquiti documents the connector mainly for its official Integration API. This a
 | `site` | UniFi site's short name. `default` unless you run several sites (it's the `default` in `…/network/default/dashboard` in the UniFi URL) |
 | `force_provision` | Push changes to the gateway immediately (see above) |
 | `notify_services` | Where admin alerts go: one entry per notify service, e.g. `mobile_app_ashish_phone` (find yours under Developer tools → Actions, search "notify.") |
-| `grant_durations` | The time choices, in hours, offered for grants and for "open to anyone". Default `1, 2, 5` |
+| `grant_durations` | The time choices, in whole hours (1-720), offered for grants and for "open to anyone". Type each one and press Enter. Default `1, 2, 5` |
 | `public_ip_lookup` | Lets the browser ask `api.ipify.org` for its own public IP so "This device" can be filled in for you. Turn off if you'd rather not contact a third party |
 | `wifi_password_length` | Length of generated WiFi passwords (8-63) |
 | `log_level` | `debug` shows every UniFi call in the Log tab |
