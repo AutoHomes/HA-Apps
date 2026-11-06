@@ -1,0 +1,15 @@
+configuration:
+  script:
+    name: Script
+    description: "The script to run when the doorbell button is pressed, e.g. script.doorbell_pressed. It receives lock_name, lock_id, code and value as variables."
+  locks:
+    name: Locks
+    description: "Leave empty to find your lock(s) automatically. Otherwise type each lock's name (as in Smart Life) or device ID and press Enter - the app's page lists every device."
+  doorbell_codes:
+    name: Doorbell codes
+    description: "Which reports count as a doorbell press. 'doorbell' is Tuya's standard. Press your doorbell and check Live activity on the app's page if your lock reports something else. Use code=value to match one value only."
+  cooldown_seconds:
+    name: Cooldown (seconds)
+    description: "Ignore further presses from the same lock for this long, so one press (or an impatient visitor) rings once. 0 = off."
+  log_level:
+    name: Log level
