@@ -16,6 +16,7 @@ const S = {
   loginSeenAt: null, // browser time the current QR code was first shown
   loginExpired: false,
   showOther: false,
+  feedAll: false,    // Live activity: every device instead of just the locks
   busy: false,
 };
 
@@ -266,14 +267,22 @@ function scriptCard(settings) {
     h('div', { class: 'actions' }, button('Ring now (test)', test)));
 }
 
+function lastMessage(device) {
+  if (!device.messages) return 'No messages from Tuya for it yet';
+  return `${device.messages} message${device.messages === 1 ? '' : 's'} from Tuya, last at ${fmtTime(device.last_message_at)}`;
+}
+
 function deviceRow(device, settings) {
   const hits = new Set(device.doorbell_codes);
+  const dps = Object.entries(device.doorbell_dps || {});
   return h('li', {},
     h('div', { class: 'row-head' },
       h('span', { class: 'row-title' }, device.name),
       h('span', { class: `badge ${device.online ? 'ok' : 'neutral'}` }, device.online ? 'Online' : 'Offline / asleep')),
     h('div', { class: 'sub' }, [device.product, device.category && `category ${device.category}`].filter(Boolean).join(' · ')),
     h('div', { class: 'sub mono' }, device.id),
+    device.watched && h('div', { class: 'sub' }, lastMessage(device),
+      dps.length ? [' · doorbell is ', dps.map(([c, dp], i) => [i ? ', ' : '', code(c), ` (DP ${dp})`])] : ''),
     device.watched && !hits.size && h('p', { class: 'hint' },
       'Tuya doesn\'t list ', settings.doorbell_codes.map((c, i) => [i ? ' or ' : '', code(c.split('=')[0])]),
       ' for this lock. Press its doorbell button and watch ', h('b', {}, 'Live activity'), ' below to see what it reports.'),
@@ -307,14 +316,30 @@ function locksCard(devices, settings) {
     h('div', { class: 'actions' }, button('Refresh devices', refreshDevices)));
 }
 
-function feedCard(feed, settings) {
+function feedStatus(tuya) {
+  const feed = tuya.feed;
+  if (!tuya.live || !feed) return null;
+  if (feed.refused) {
+    return h('div', { class: 'notice warn' }, `Tuya refused ${feed.refused} of the app's subscriptions, so some devices can't be heard. The Log tab lists them.`);
+  }
+  if (!feed.messages) {
+    return h('div', { class: 'notice info' }, 'No messages from Tuya yet, from any device. Switch something on or off in the Smart Life app. ',
+      'If this still says nothing, Tuya isn\'t sending the app anything.');
+  }
+  return h('p', { class: 'hint' },
+    `Tuya has sent ${feed.messages} message${feed.messages === 1 ? '' : 's'} since the app connected `,
+    `(${feed.lock_messages} from your locks), the last at ${fmtTime(feed.last_message_at)}.`);
+}
+
+function feedCard(status) {
+  const feed = S.feedAll ? status.all_feed : status.feed;
   const items = feed.map((entry) => {
     let result = null;
     if (entry.result) {
       const cls = entry.ok === false ? 'err' : entry.ok ? 'ok' : 'muted';
       result = h('div', { class: `result ${cls}` }, entry.result);
     }
-    return h('li', { class: entry.doorbell ? 'doorbell' : '' },
+    return h('li', { class: entry.doorbell ? 'doorbell' : entry.watched === false ? 'other' : '' },
       h('span', { class: 'icon' }, entry.doorbell ? '🔔' : '•'),
       h('span', { class: 'what' }, `${entry.lock_name}: `, code(entry.code), ' = ', h('span', { class: 'mono' }, fmtValue(entry.value)),
         entry.dp_id != null ? h('span', { class: 'sub' }, ` (DP ${entry.dp_id})`) : ''),
@@ -322,14 +347,26 @@ function feedCard(feed, settings) {
       result);
   });
   const example = feed.find((e) => !e.doorbell);
+  const tab = (label, all) => h('button', {
+    type: 'button', class: `seg-btn${S.feedAll === all ? ' on' : ''}`, 'aria-pressed': S.feedAll === all ? 'true' : 'false',
+    onclick: () => { S.feedAll = all; render(); },
+  }, label);
   return h('div', { class: 'card' },
-    h('h3', {}, 'Live activity'),
-    h('div', { class: 'sub' }, 'Everything your lock reports, as it happens. Press the doorbell button to try it. A battery lock can take a few seconds to wake up and report.'),
+    h('div', { class: 'card-head' },
+      h('h3', {}, 'Live activity'),
+      h('div', { class: 'seg', role: 'group', 'aria-label': 'Show reports from' }, tab('Locks', false), tab('All devices', true))),
+    h('div', { class: 'sub' }, S.feedAll
+      ? 'Every report from every device on your Smart Life account. Use it to see which device reports something at the moment you press the doorbell.'
+      : 'Everything your locks report, as it happens. Press the doorbell button to try it. A battery lock can take a few seconds to wake up and report.'),
+    feedStatus(status.tuya),
     items.length ? h('ul', { class: 'rows feed' }, items) : h('div', { class: 'empty' }, 'Nothing reported since the app started.'),
-    h('p', { class: 'hint' }, 'Pressed the button but nothing got a 🔔? Find the report that appeared at that moment and add its code',
-      example ? [' (e.g. ', code(example.code), ')'] : '',
-      ' under ', h('b', {}, 'Doorbell codes'), ' on the Configuration tab, then restart the app. Use ', code('code=value'),
-      ' to match just one value.'));
+    S.feedAll
+      ? h('p', { class: 'hint' }, 'Was it a device other than your lock (e.g. the camera of a video lock)? Add that device\'s name under ',
+        h('b', {}, 'Locks'), ' and its code under ', h('b', {}, 'Doorbell codes'), ' on the Configuration tab, then restart the app.')
+      : h('p', { class: 'hint' }, 'Pressed the button but nothing got a 🔔? Find the report that appeared at that moment and add its code',
+        example ? [' (e.g. ', code(example.code), ')'] : '',
+        ' under ', h('b', {}, 'Doorbell codes'), ' on the Configuration tab, then restart the app. Use ', code('code=value'),
+        ' to match just one value. Nothing at all? Switch to ', h('b', {}, 'All devices'), ' and press it again.'));
 }
 
 function ringsCard(rings) {
@@ -352,7 +389,8 @@ function otherDevicesCard(devices) {
       h('p', { class: 'hint' }, 'Not listened to. If your lock is here, add its name or ID under ', h('b', {}, 'Locks'), ' on the Configuration tab.'),
       h('ul', { class: 'rows' }, others.map((d) => h('li', {},
         h('div', { class: 'row-head' }, h('span', { class: 'row-title' }, d.name), h('span', { class: 'sub' }, d.category)),
-        h('div', { class: 'sub mono' }, d.id))))));
+        h('div', { class: 'sub mono' }, d.id),
+        h('div', { class: 'sub' }, lastMessage(d)))))));
 }
 
 function accountCard(tuya) {
@@ -372,13 +410,13 @@ function accountCard(tuya) {
 }
 
 function mainView() {
-  const { tuya, settings, devices, feed, rings } = S.status;
+  const { tuya, settings, devices, rings } = S.status;
   if (tuya.state === 'signed_out') return tuya.login_pending ? qrView(tuya) : signInView();
   return [
     connectionNotice(tuya),
     scriptCard(settings),
     locksCard(devices, settings),
-    feedCard(feed, settings),
+    feedCard(S.status),
     ringsCard(rings),
     otherDevicesCard(devices),
     accountCard(tuya),

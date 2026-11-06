@@ -106,6 +106,7 @@ async def status(request: web.Request) -> web.Response:
                 "cooldown_seconds": opts.cooldown_seconds,
             },
             "feed": [{**entry, "value": _short(entry["value"])} for entry in ctx.doorbell.feed],
+            "all_feed": [{**entry, "value": _short(entry["value"])} for entry in ctx.doorbell.all_feed],
             "rings": [{**entry, "value": _short(entry.get("value"))} for entry in ctx.store.rings[:20]],
         }
     )

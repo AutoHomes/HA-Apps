@@ -16,6 +16,7 @@ _LOGGER = logging.getLogger(__name__)
 EVENT_PRESSED = "tuya_doorbell_pressed"
 EVENT_REPORT = "tuya_lock_report"
 FEED_LIMIT = 60
+ALL_FEED_LIMIT = 100
 SCRIPT_CHECK_TTL = 15
 
 
@@ -26,6 +27,8 @@ class Doorbell:
         self.store = store
         # Every report from a watched lock, newest first (memory only).
         self.feed: deque[dict] = deque(maxlen=FEED_LIMIT)
+        # Every report from any device, to find which one reports the doorbell.
+        self.all_feed: deque[dict] = deque(maxlen=ALL_FEED_LIMIT)
         self._last_ring: dict[str, float] = {}
         self._queue: asyncio.Queue[Report] = asyncio.Queue()
         self._script_info: dict | None = None
@@ -47,7 +50,7 @@ class Doorbell:
         return next((rule for rule in self.opts.doorbell_codes if rule.matches(code, value)), None)
 
     async def _handle(self, report: Report) -> None:
-        rule = self.match(report.code, report.value)
+        rule = self.match(report.code, report.value) if report.watched else None
         entry = {
             "ts": report.ts,
             "lock_id": report.lock_id,
@@ -55,10 +58,14 @@ class Doorbell:
             "code": report.code,
             "value": report.value,
             "dp_id": report.dp_id,
+            "watched": report.watched,
             "doorbell": rule is not None,
             "result": None,
             "ok": None,
         }
+        self.all_feed.appendleft(entry)
+        if not report.watched:
+            return  # another device: shown on the page, never rings
         self.feed.appendleft(entry)
         _LOGGER.info(
             "%s reported %s = %r%s",

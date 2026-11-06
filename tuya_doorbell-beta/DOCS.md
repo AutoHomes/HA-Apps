@@ -123,7 +123,12 @@ actions:
 
 - **"Smart Life didn't accept that user code"**: use the *User Code* from **Me → Settings → Account and Security**, not your email or password.
 - **No locks found**: the **Other Smart Life devices** list on the app's page shows everything on the account. Add your lock's name or ID under `locks` and restart the app. If your lock isn't listed at all, it's paired to a different account. Share it to this one in the Smart Life app, or sign in with the owner's account.
-- **Unlocks show in Live activity but the doorbell press shows nothing at all**: the lock doesn't report the press to Tuya's device feed (some models only ring their own chime), so the app can't see it.
+- **Pressing the doorbell shows nothing**: work through these in order.
+  1. Under **Live activity**, check the line "Tuya has sent N messages". If it says no messages at all, switch something on or off in the Smart Life app. If that doesn't show up either, Tuya isn't sending the app anything. Check the **Log tab** for "Tuya refused" or "Lost the connection".
+  2. Unlock the lock with a fingerprint or code. If that appears, the feed works for the lock.
+  3. Switch Live activity to **All devices** and press the doorbell. If a *different* device reports something at that moment (often the camera of a video lock), add that device's name under `locks` and its code under `doorbell_codes`.
+  4. If unlocks show up but the doorbell press shows nothing on any device, the lock doesn't report the press to Tuya's device feed (some models only ring their own chime), so the app can't see it.
+- **The Log tab** lists each lock's data points at startup (e.g. `24 doorbell`), whether Tuya accepted each subscription, and every raw message from a lock.
 - **"Can't reach Tuya"**: the app retries on its own. If it doesn't recover, for example after you removed the authorization in the Smart Life app, sign out and sign in again.
 - **Added a lock after starting the app**: press **Refresh devices**.
 - Set `log_level` to `debug` and check the **Log** tab to see every raw message from your locks.

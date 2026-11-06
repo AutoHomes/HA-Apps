@@ -1,5 +1,5 @@
 name: "Tuya Lock Doorbell (beta)"
-version: "1.0.0"
+version: "1.0.1"
 slug: "tuya_doorbell-beta"
 stage: experimental
 description: "[Beta] Run a Home Assistant script when someone presses the doorbell button on your Tuya / Smart Life smart lock"

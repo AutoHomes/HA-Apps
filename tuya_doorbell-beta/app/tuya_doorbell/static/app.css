@@ -146,6 +146,15 @@ input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: -1px;
 .feed .result.err { color: var(--err); }
 .feed .result.muted { color: var(--muted); }
 .feed li.doorbell .what { font-weight: 600; }
+.feed li.other .what { color: var(--muted); }
+
+.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; flex: none; }
+.seg-btn {
+  appearance: none; border: 0; background: var(--surface); color: var(--muted); font: inherit; font-size: .85rem;
+  font-weight: 600; padding: 6px 12px; cursor: pointer; min-height: 34px;
+}
+.seg-btn + .seg-btn { border-left: 1px solid var(--border); }
+.seg-btn.on { background: var(--accent-soft); color: var(--accent); }
 
 details.more { margin-top: 4px; }
 details.more > summary { cursor: pointer; color: var(--accent); font-weight: 600; font-size: .92rem; padding: 6px 0; list-style: none; }
